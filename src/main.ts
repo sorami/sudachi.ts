@@ -1,16 +1,26 @@
 const fs = require('fs');
 
-fs.readFile('system.dic', (err, content) => {
+fs.readFile('system.dic', (err: any, content: ArrayBuffer) => {
     if (err) {
         console.error(err);
     }
 
     let buf = Buffer.from(content);
-    let version = buf.readBigUInt64LE(0);
-    let createTime = buf.readBigInt64LE(64);
+    let offset = 0;
+
+    // header
+    const version = buf.readBigUInt64LE(offset);
+    offset += 8;
+    const createTime = buf.readBigInt64LE(offset);
+    offset += 8;
+
+    const description_size = 256;
+    const description = buf.toString('utf8', offset, offset + description_size);
+    offset += description_size * 8;
 
     console.log(`version: 0x${version.toString(16)}`);
     console.log(`create time: ${createTime}`);
+    console.log(`description: ${description}`);
 });
 
 
